@@ -39,7 +39,7 @@ public class IOService {
 
 		System.out.println(testUser.toString());
 
-		LocalDateTime now = LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul")));
+		LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 		this.ioLogRepository.save(IOLog.builder()
 				.date(now)
 				.place(place)
@@ -48,7 +48,7 @@ public class IOService {
 
 		return IOLogResponse.builder()
 				.userName(user.getName())
-				.date(now.format(DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss")))
+				.date(now.toString())
 				.place(place.getPlaceName())
 				.build();
 	}
