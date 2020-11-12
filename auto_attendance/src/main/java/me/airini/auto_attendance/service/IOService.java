@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -38,7 +39,7 @@ public class IOService {
 
 		System.out.println(testUser.toString());
 
-		LocalDateTime now = LocalDateTime.now(Clock.systemDefaultZone());
+		LocalDateTime now = LocalDateTime.now(Clock.system(ZoneId.of("Asia/Seoul")));
 		this.ioLogRepository.save(IOLog.builder()
 				.date(now)
 				.place(place)
