@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZoneId;
 
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
 	@ExceptionHandler({ IllegalSignalException.class, IllegalUserIDException.class })
 	public ResponseEntity<ResponseBody> handleBadRequest(RuntimeException e) {
 		return ResponseEntity.badRequest().body(ResponseBody.builder()
-				.date(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy:MM:dd hh:mm:ss")))
+				.date(LocalDateTime.now(ZoneId.of("Asia/Seoul")).toString())
 				.message(e.getMessage())
 				.build());
 	}
