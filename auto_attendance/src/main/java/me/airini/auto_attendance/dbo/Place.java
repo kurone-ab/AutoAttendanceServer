@@ -22,4 +22,12 @@ public class Place {
 		this.signalCode = signalCode;
 		this.placeName = placeName;
 	}
+
+	@Override
+	public String toString() {
+		return "Place{" +
+				"signalCode=" + signalCode +
+				", placeName='" + placeName + '\'' +
+				'}';
+	}
 }

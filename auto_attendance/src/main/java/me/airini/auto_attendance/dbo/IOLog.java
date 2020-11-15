@@ -18,7 +18,7 @@ public class IOLog {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	@Column(columnDefinition = "datetime")
-	private LocalDateTime date;
+	private LocalDateTime date;//1day = 86400s
 	@ManyToOne
 	private User user;
 	@ManyToOne
@@ -29,5 +29,15 @@ public class IOLog {
 		this.date = date;
 		this.user = user;
 		this.place = place;
+	}
+
+	@Override
+	public String toString() {
+		return "IOLog{" +
+				"id=" + id +
+				", date=" + date +
+				", user=" + user +
+				", place=" + place +
+				'}';
 	}
 }

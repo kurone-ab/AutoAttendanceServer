@@ -4,6 +4,7 @@ import me.airini.auto_attendance.dbo.IOLog;
 import me.airini.auto_attendance.dbo.Place;
 import me.airini.auto_attendance.dbo.User;
 import me.airini.auto_attendance.dto.IOLogResponse;
+import me.airini.auto_attendance.dto.UserResponse;
 import me.airini.auto_attendance.exception.IllegalSignalException;
 import me.airini.auto_attendance.exception.IllegalUserIDException;
 import me.airini.auto_attendance.repository.IOLogRepository;
@@ -12,10 +13,11 @@ import me.airini.auto_attendance.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class IOService {
@@ -33,11 +35,6 @@ public class IOService {
 	public IOLogResponse userPlaceChange(int signal, int userID) {
 		Place place = this.placeRepository.findById(signal).orElseThrow(() -> new IllegalSignalException(Integer.toString(signal)));
 		User user = this.userRepository.findById(userID).orElseThrow(() -> new IllegalUserIDException(Integer.toString(userID)));
-		User testUser = this.userRepository.findNameById(user.getId());
-
-		System.out.println(this.userRepository.findAllNames().toString());
-
-		System.out.println(testUser.toString());
 
 		LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 		this.ioLogRepository.save(IOLog.builder()
@@ -51,5 +48,26 @@ public class IOService {
 				.date(now.toString())
 				.place(place.getPlaceName())
 				.build();
+	}
+
+	public Map<Integer, UserResponse> retrieveAllLogByPlaceAndDate(Place place, LocalDate date) {
+		Map<Integer, UserResponse> userResponses = new HashMap<>();
+		for (IOLog ioLog : this.ioLogRepository.findAllByPlaceAndDateBetween(place, date.atStartOfDay(), date.plusDays(1).atStartOfDay())) {
+			User user = ioLog.getUser();
+			UserResponse response = UserResponse.builder()
+					.name(user.getName())
+					.build();
+			if (userResponses.containsKey(user.getId())) {
+				userResponses.get(user.getId()).addStayPeriod(ioLog.getDate(), this.getChangedDateTime(user, ioLog.getId()));
+			} else {
+				response.addStayPeriod(ioLog.getDate(), this.getChangedDateTime(user, ioLog.getId()));
+				userResponses.put(user.getId(), response);
+			}
+		}
+		return userResponses;
+	}
+
+	private LocalDateTime getChangedDateTime(User user, int id) {
+		return this.ioLogRepository.findFirstByUserAndIdGreaterThan(user, id);
 	}
 }
